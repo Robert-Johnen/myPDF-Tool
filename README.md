@@ -103,8 +103,8 @@ user@linux:~/Pfad/zu/den/entpackten/Dateien/maPDF-Tool> bash ./install
   pdfjam, cfftot1, mutool, tesseract, qpdf, convert, rsync
   
 
-* nemo_pdf_tool_wrapper (Bash-Script) - ruft für jede als Parameter übergebene Datei das Script _ksm_pdf_tool_ auf und </br>
-lässt die Funktion ausfühern, die ebenfalls mit als Parameter übergeben wurde. Dieses Script wird für nemo installiert, um</br>
+* nemo_pdf_tool_wrapper (Bash-Script) - ruft für jede als Parameter übergebene Datei das Script _ksm_pdf_tool_ auf und 
+lässt die Funktion ausfühern, die ebenfalls mit als Parameter übergeben wurde. Dieses Script wird für nemo installiert, um
 unter Nemo eine Mehrfachselektion zu ermöglichen, da _ksm_pdf_tool_ nur eine Datei pro Aufruf verarbeiten kann. 
 
 * pdf_tool_alles.nemo_action - ruft das Script _nemowrapper_pdftool_ mit dem Parameter ALLES und allen markierten Dateien auf
