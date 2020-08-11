@@ -1,0 +1,109 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/pdf;
+Icon=okular
+Actions=JPEG;PNG;REVERSE;INFO;TEXTEXT;TEXTEXTOCR;IMGEXT;SEPPAGES;DETACH;ATTACH;HTML;PS;ALLES;PDFA1B;ROTL;ROTR;ROTD;M2S;M4S;ALLFEAT;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=PDF...
+
+[Desktop Action JPEG]
+Name=zu JPEG-Bild konvertieren
+Icon=image-jpg
+Exec=ksm_pdf_tool %f CONVJPG
+
+[Desktop Action PNG]
+Name=zu PNG-Bild konvertieren
+Icon=image-png
+Exec=ksm_pdf_tool %f CONVPNG
+
+[Desktop Action REVERSE]
+Name=Seitenfolge umkehren
+Icon=image-png
+Exec=ksm_pdf_tool %f REVERSE
+
+[Desktop Action INFO]
+Name=Infos extrahieren
+Icon=kate
+Exec=ksm_pdf_tool %f INFO
+
+[Desktop Action TEXTEXT]
+Name=Text extrahieren
+Icon=kate
+Exec=ksm_pdf_tool %f TEXTEXT
+
+[Desktop Action TEXTEXTOCR]
+Name=Text mit OCR extrahieren
+Icon=kate
+Exec=ksm_pdf_tool %f TEXTEXT 400
+
+[Desktop Action IMGEXT]
+Name=Bilder extrahieren
+Icon=image-jpg
+Exec=ksm_pdf_tool %f IMGEXT
+
+[Desktop Action SEPPAGES]
+Name=in Einzelseiten aufteilen
+Icon=okular
+Exec=ksm_pdf_tool %f SEPPAGES
+
+[Desktop Action DETACH]
+Name=eingebettete Dateien extrahieren
+Icon=dolphin
+Exec=ksm_pdf_tool %f DETACH
+
+[Desktop Action ATTACH]
+Name=Datei in diese PDF-Datei(en) einbetten
+Icon=dolphin
+Exec=ksm_pdf_tool %f ATTACH "`kdialog --title %n --getopenfilename %d`"
+
+[Desktop Action HTML]
+Name=als HTML-Frame speichern
+Icon=konqueror
+Exec=ksm_pdf_tool %f HTML
+
+[Desktop Action PS]
+Name=umwandeln in PostScript-Datei
+Icon=okular
+Exec=ksm_pdf_tool %f PS
+
+[Desktop Action ALLES]
+Name=Datei in eigenes Verzeichnis zerlegen
+Icon=okular
+Exec=ksm_pdf_tool %f ALLES
+
+[Desktop Action PDFA1B]
+Name=Wandeln in PDF/A-1b
+Icon=okular
+Exec=ksm_pdf_tool %f PDFA1B
+
+[Desktop Action ROTL]
+Name=Rotiere 90° links herum
+Icon=object-rotate-left
+Exec=ksm_pdf_tool %f ROTL
+
+[Desktop Action ROTR]
+Name=Rotiere 90° rechts herum
+Icon=object-rotate-right
+Exec=ksm_pdf_tool %f ROTR
+
+[Desktop Action ROTD]
+Name=Rotiere 180°
+Icon=object-flip-vertical
+Exec=ksm_pdf_tool %f ROTD
+
+[Desktop Action M2S]
+Name=Konvertiere zu 2 Seiten pro Blatt mit Rahmen
+Icon=object-flip-horizontal
+Exec=ksm_pdf_tool %f M2S
+
+[Desktop Action M4S]
+Name=Konvertiere zu 4 Seiten pro Blatt mit Rahmen
+Icon=object-flip-horizontal
+Exec=ksm_pdf_tool %f M4S
+
+[Desktop Action ALLFEAT]
+Name=Restriktionen entfernen
+Icon=kgpg
+Exec=ksm_pdf_tool %f ALLFEAT
