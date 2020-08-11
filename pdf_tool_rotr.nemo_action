@@ -2,7 +2,7 @@
 Name=PDF-Datei - rotiere 90° rechts
 Comment=PDF-Datei
 Dependencies=pdfinfo;oyranos-icc;podofopdfinfo;pdffonts;pdfimages;pdfdetach;pdfseparate;pdftops;pdftocairo;pdftohtml;pdftotext;pdftoppm;pdftk;pdfjam;cfftot1;mutool;tesseract;qpdf;convert;
-Exec=<pdf_tool_wrapper.nemo_script "ROTR" %F>
+Exec=nemo_pdf_tool_wrapper "ROTR" %F
 Icon-Name=application-pdf
 Selection=any
 #Separator=;

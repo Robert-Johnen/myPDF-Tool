@@ -1,0 +1,35 @@
+#! /bin/bash
+#--------------------------------------------------------------------------------------#
+#
+### Wrapper-Script fuer pdf.nemo_action
+### gedacht fuer das Kontextmenue Nemo
+### (c) Robert Johnen
+#
+#--------------------------------------------------------------------------------------#
+# set -x					# zum Debuggen 
+
+#--------------------------------------------------------------------------------------#
+#------------------------------------ Hauptprogramm -----------------------------------#
+#--------------------------------------------------------------------------------------#
+cd ~/bin
+PARA="${1}"                                                 # Parameter fuer ksm_pdf_tool
+shift
+while [ -n "${1}" ]                                         # wenn nicht leer, dann wiederhole
+    do                                                      
+    if file "${1}" | grep PDF\ document
+      then
+      ksm_pdf_tool "${1}" $PARA
+      ((ANZAHL+=1))                                         # Anzahl der verarbeiteten PDF-Dateien
+      else                                                  # Test nicht bestanden
+      echo "Fehler bei ${1}"
+      fi
+    shift                                                   # loescht $1 und rueckt $2 auf $1 vor
+    done                                                    # bis Parameterliste leer
+
+if [ $ANZAHL -gt 0 ]                                        # wenn anzahl der Anhaenge > 0
+  then                                                      # bastele die Befehlszeilefuer thnderbird
+  echo "${ANZAHL} Objekte verarbeitet"
+  else                                                      # wenn Anzahl = 0 dann sag wies geht...
+  echo Usage: `basename $0` "PARAMETER" file1 file2 file3 ...
+  fi
+  

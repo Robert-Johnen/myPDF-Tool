@@ -1,8 +1,8 @@
 [Nemo Action]
-#Name=PDF-Datei - in eigenes Verzeichnis zerlegen
+Name=PDF-Datei - in eigenes Verzeichnis zerlegen
 Comment=PDF-Datei
 Dependencies=pdfinfo;oyranos-icc;podofopdfinfo;pdffonts;pdfimages;pdfdetach;pdfseparate;pdftops;pdftocairo;pdftohtml;pdftotext;pdftoppm;pdftk;pdfjam;cfftot1;mutool;tesseract;qpdf;convert;
-Exec=<pdf_tool_wrapper.nemo_script "ALLES 150" %F>
+Exec=nemo_pdf_tool_wrapper "ALLES 150" %F
 Icon-Name=application-pdf
 Selection=any
 #Separator=;

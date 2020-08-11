@@ -2,7 +2,7 @@
 Name=PDF-Datei - Restriktionen aufheben
 Comment=PDF-Datei
 Dependencies=pdfinfo;oyranos-icc;podofopdfinfo;pdffonts;pdfimages;pdfdetach;pdfseparate;pdftops;pdftocairo;pdftohtml;pdftotext;pdftoppm;pdftk;pdfjam;cfftot1;mutool;tesseract;qpdf;convert;
-Exec=<pdf_tool_wrapper.nemo_script "ALLFEAT" %F>
+Exec=nemo_pdf_tool_wrapper "ALLFEAT" %F
 Icon-Name=application-pdf
 Selection=any
 #Separator=;
