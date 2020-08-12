@@ -32,27 +32,28 @@ ERRCODE=0                            # Fehlercode auf Nullwert
 # muessen die Variablen an den dort liegenden Verzeichnisbaum angepasst werden.
 # !!!!! Achtung: Leerzeichen im Verzeichnisnamen muessen maskiert werden
 DIRAUDIO="Audiodaten"                # Verzeichnis fuer Audiodaten
-DIRSNDFONT="Audiodaten/SoundFonts"   # Verzeichnis fuer SoundFonts
+DIRMIDI="${DIRAUDIO}/Midi"           # Verzeichnis Mididateien
+DIRSNDFONT="${DIRAUDIO}/SoundFonts"  # Verzeichnis fuer SoundFonts
 DIROUTPUT="Ausgabe"                  # Verzeichnis fuer PDF-Ausgaben
 DIRBCKUP="Backup"                    # Verzeichnis fuer alte Versionen
-DIRBCKORIG="Backup/Rohdaten"         # Verzeichnis fuer Originaldaten
+DIRBCKORIG="${DIRBCKUP}/Rohdaten"    # Verzeichnis fuer Originaldaten
 DIRIMGS="Bilddaten"                  # Verzeichnis fuer Bilder
-DIRANIM="Bilddaten/Animationen"      # Verzeichnis fuer Animationsdaten
-DIRVECTOR="Bilddaten/Grafiken"       # Verzeichnis fuer Vektordaten
-DIRPALETTES="Bilddaten/Paletten"     # Verzeichnis fuer Farbpaletten 
-DIRPROFILES="Bilddaten/Profile"      # Verzeichnis fuer Farbprofile
-DIRVIDEOS="Bilddaten/Videos"         # Verzeichnis fuer Videodaten
+DIRANIM="${DIRIMGS}/Animationen"     # Verzeichnis fuer Animationsdaten
+DIRVECTOR="${DIRIMGS}/Grafiken"      # Verzeichnis fuer Vektordaten
+DIRPALETTES="${DIRIMGS}/Paletten"    # Verzeichnis fuer Farbpaletten 
+DIRPROFILES="${DIRIMGS}/Profile"     # Verzeichnis fuer Farbprofile
+DIRVIDEOS="${DIRIMGS}/Videos"        # Verzeichnis fuer Videodaten
 DIRATTACH="Dateianhaenge"            # Verzeichnis fuer Dateianhaenge
 DIRSERIAL="Seriendruckdaten"         # Verzeichnis fuer Seriendruckdaten
 DIRTXT="Textdaten"                   # Verzeichnis fuer Texte
-DIRHTML="Textdaten/HTML"             # Verzeichnis fuer HTML/XML-Dateien
-DIRFONTS="Textdaten/Schriften"       # Verzeichnis fuer Fontdateien
-DIRSTYLES="Textdaten/Stile"          # Verzeichnis fuer Stilvorlagen
-DIRGRIDS="Textdaten/Tabellen"        # Verzeichnis fuer Tabellen
+DIRHTML="${DIRTXT}/HTML"             # Verzeichnis fuer HTML/XML-Dateien
+DIRFONTS="${DIRTXT}/Schriften"       # Verzeichnis fuer Fontdateien
+DIRSTYLES="${DIRTXT}/Stile"          # Verzeichnis fuer Stilvorlagen
+DIRGRIDS="${DIRTXT}/Tabellen"        # Verzeichnis fuer Tabellen
 
-#mit rsync die Verzeichnisstruktur aus einer Vorlage kopieren, dann 
+# mit cp -rf die Verzeichnisstruktur aus einer Vorlage kopieren, dann 
 # aus dieser Variable
-# DIRSTRUCT="${HOME}/Oeffentlich/Vorlagen/scribus/NEU/"
+DIRSTRUCT="${HOME}/Oeffentlich/Vorlagen/scribus/NEU"
 
 # Standardaufloesung fuer Bilder in dpi
 PARAM3=150
@@ -138,14 +139,12 @@ if [ -e "${1}" ] # wenn Datei existiert
 # je nach Taetigkeit anderes Feld ausfuehren
 case ${TOOL} in 
 ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzeichnis
-  # lege das neue Verzeichnis an
-  mkdir "${DNAMENOEXT}"
+  # erstelle Verzeichnisstruktur entweder mit cp -rf aus Verzeichnisbaum oder mit mkdir -p wenn Vorlagenverzeichnis nicht existent
+  [ -d "${DIRSTRUCT}" ] && cp -rf "${DIRSTRUCT}" "${DNAMENOEXT}" || mkdir -p "${DIRMIDI}" "${DIRSNDFONT}" "${DIROUTPUT}" "${DIRBCKORIG}" "${DIRANIM}" "${DIRVECTOR}" "${DIRPALETTES}" "${DIRPROFILES}" "${DIRVIDEOS}" "${DIRATTACH}" "${DIRSERIAL}" "${DIRHTML}" "${DIRFONTS}" "${DIRSTYLES}" "${DIRGRIDS}"
   # wechsele dann hinein 
   cd "${DNAMENOEXT}"
   # und kopiere die Originaldatei hinein
   cp "../${DNAME}" "${DNAME}"
-  # erstelle Verzeichnisstruktur entweder mit rsync aus Verzeichnisbaum oder mit mkdir wenn Vorlagenverzeichnis nicht existent
-  [ -d "${DIRSTRUCT}" ] && rsync -av -f"+ */" -f"- *" "${DIRSTRUCT}" . || mkdir "${DIRAUDIO}" "${DIRSNDFONT}" "${DIROUTPUT}" "${DIRBCKUP}" "${DIRBCKORIG}" "${DIRIMGS}" "${DIRANIM}" "${DIRVECTOR}" "${DIRPALETTES}" "${DIRPROFILES}" "${DIRVIDEOS}" "${DIRATTACH}" "${DIRSERIAL}" "${DIRTXT}" "${DIRHTML}" "${DIRFONTS}" "${DIRSTYLES}" "${DIRGRIDS}"
   # separiere Einzelseiten als PDFs erstellen
   ${SCRIPTNAME} "${DNAME}" SEPPAGES
   # aus jeder Einzelseite
