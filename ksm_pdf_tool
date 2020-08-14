@@ -73,7 +73,7 @@ PARAM4="deu"
 # wenn die Funktion nicht eingebunden wurde, Fehler auswerfen, aber weiter machen
 #declare -f testbinary > /dev/null && testbinary -b realpath file sort uniq basename dirname tr grep awk ls mv mkdir rm cp pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert
 
-which realpath file sort uniq basename dirname tr grep awk ls mv mkdir rm cp pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert > /dev/null
+which realpath sort uniq basename dirname tr grep awk pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert > /dev/null
 
 
 #--------------------------------------------------------------------------------------#
@@ -512,10 +512,10 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
                 Standardaufloesung von 150dpi gesetzt
 
   Benoetigt werden folgende Programme:
-  realpath, basename, dirname, tr, grep, awk, ls, mv, mkdir, rm, cp, sort, file,
+  realpath, basename, dirname, tr, grep, awk, sort,
   uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
   pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
-  pdfjam, cfftot1, mutool, tesseract, qpdf, convert, rsync
+  pdfjam, cfftot1, mutool, tesseract, qpdf, convert
   
 EOF
  ;;
