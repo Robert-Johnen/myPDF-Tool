@@ -3,7 +3,7 @@
 ### extrahiert alle moegliche Details/Infos aus einer PDF-Datei
 ### oder zerlegt die PDF-Datei in ihre einzelnen darin vorhandenen
 ### Komponenten
-### (gedacht ist dieses Script fuer das KDE-Servicemenu)
+### (gedacht ist dieses Script für das KDE-Servicemenu)
 ### (c) Robert Johnen
 ###
 # fuers Debuggen
@@ -24,40 +24,40 @@ ERRCODE=0                            # Fehlercode auf Nullwert
 # Da ich die Verzeichnisstruktur auch in Scribus nutze,
 # habe ich diese so 1:1 uebernommen. Die PDF, wenn ich sie
 # zur Fehleranalyse auseinandernehme, wird von mir mit Scribus
-# wieder zusammengebastelt wird. Diese Variablen werden nur
+# wieder zusammengebastelt. Diese Variablen werden nur
 # genutzt, wenn die Verzeichnisse mit mkdir erstellt werden muessen
 # sollte das Vereichnis ~/Oeffentlich/Vorlagen/Scribus/NEU existieren,
-# wird von dort der Verzeichnisbaum per rsync kopiert
+# wird von dort der Verzeichnisbaum per cp -rf kopiert
 # sollte dieser Verzeichnisbaum nicht mit den Variablen uebereinstimmen,
 # muessen die Variablen an den dort liegenden Verzeichnisbaum angepasst werden.
 # !!!!! Achtung: Leerzeichen im Verzeichnisnamen muessen maskiert werden
-DIRAUDIO="Audiodaten"                # Verzeichnis fuer Audiodaten
+DIRAUDIO="Audiodaten"                # Verzeichnis für Audiodaten
 DIRMIDI="${DIRAUDIO}/Midi"           # Verzeichnis Mididateien
-DIRSNDFONT="${DIRAUDIO}/SoundFonts"  # Verzeichnis fuer SoundFonts
-DIROUTPUT="Ausgabe"                  # Verzeichnis fuer PDF-Ausgaben
-DIRBCKUP="Backup"                    # Verzeichnis fuer alte Versionen
-DIRBCKORIG="${DIRBCKUP}/Rohdaten"    # Verzeichnis fuer Originaldaten
-DIRIMGS="Bilddaten"                  # Verzeichnis fuer Bilder
-DIRANIM="${DIRIMGS}/Animationen"     # Verzeichnis fuer Animationsdaten
-DIRVECTOR="${DIRIMGS}/Grafiken"      # Verzeichnis fuer Vektordaten
-DIRPALETTES="${DIRIMGS}/Paletten"    # Verzeichnis fuer Farbpaletten 
-DIRPROFILES="${DIRIMGS}/Profile"     # Verzeichnis fuer Farbprofile
-DIRVIDEOS="${DIRIMGS}/Videos"        # Verzeichnis fuer Videodaten
-DIRATTACH="Dateianhaenge"            # Verzeichnis fuer Dateianhaenge
-DIRSERIAL="Seriendruckdaten"         # Verzeichnis fuer Seriendruckdaten
-DIRTXT="Textdaten"                   # Verzeichnis fuer Texte
-DIRHTML="${DIRTXT}/HTML"             # Verzeichnis fuer HTML/XML-Dateien
-DIRFONTS="${DIRTXT}/Schriften"       # Verzeichnis fuer Fontdateien
-DIRSTYLES="${DIRTXT}/Stile"          # Verzeichnis fuer Stilvorlagen
-DIRGRIDS="${DIRTXT}/Tabellen"        # Verzeichnis fuer Tabellen
+DIRSNDFONT="${DIRAUDIO}/SoundFonts"  # Verzeichnis für SoundFonts
+DIROUTPUT="Ausgabe"                  # Verzeichnis für PDF-Ausgaben
+DIRBCKUP="Backup"                    # Verzeichnis für alte Versionen
+DIRBCKORIG="${DIRBCKUP}/Rohdaten"    # Verzeichnis für Originaldaten
+DIRIMGS="Bilddaten"                  # Verzeichnis für Bilder
+DIRANIM="${DIRIMGS}/Animationen"     # Verzeichnis für Animationsdaten
+DIRVECTOR="${DIRIMGS}/Grafiken"      # Verzeichnis für Vektordaten
+DIRPALETTES="${DIRIMGS}/Paletten"    # Verzeichnis für Farbpaletten 
+DIRPROFILES="${DIRIMGS}/Profile"     # Verzeichnis für Farbprofile
+DIRVIDEOS="${DIRIMGS}/Videos"        # Verzeichnis für Videodaten
+DIRATTACH="Dateianhaenge"            # Verzeichnis für Dateianhänge
+DIRSERIAL="Seriendruckdaten"         # Verzeichnis für Seriendruckdaten
+DIRTXT="Textdaten"                   # Verzeichnis für Texte
+DIRHTML="${DIRTXT}/HTML"             # Verzeichnis für HTML/XML-Dateien
+DIRFONTS="${DIRTXT}/Schriften"       # Verzeichnis für Fontdateien
+DIRSTYLES="${DIRTXT}/Stile"          # Verzeichnis für Stilvorlagen
+DIRGRIDS="${DIRTXT}/Tabellen"        # Verzeichnis für Tabellen
 
 # mit cp -rf die Verzeichnisstruktur aus einer Vorlage kopieren, dann 
 # aus dieser Variable
 DIRSTRUCT="${HOME}/Oeffentlich/Vorlagen/scribus/NEU"
 
-# Standardaufloesung fuer Bilder in dpi
+# Standardauflösung für Bilder in dpi
 PARAM3=150
-# Standardsprache fuer Texterkennung 
+# Standardsprache für Texterkennung 
 PARAM4="deu"
 
 #--------------------------------------------------------------------------------------#
@@ -66,9 +66,9 @@ PARAM4="deu"
 #
 # hier binde ich die Funktion testbinary aus der Datei ~/bin/testbinary.include ein
 # Sie testet auf optionale und unbedingt benoetigte (-b) Binaries / Shell-builtins / Scripte
-# fehlt ein unbedingt benoetigtes stoppt hier die Scriptausfuehrung mit der Ausgabe,
-# was den tatsaechlich fehlt. fehlt ~/bin/testbinary.include wirft das Script einen
-# Fehler, laeuft aber weiter,
+# fehlt ein unbedingt benötigtes stoppt hier die Scriptausfuehrung mit der Ausgabe,
+# was den tatsächlich fehlt. fehlt ~/bin/testbinary.include wirft das Script einen
+# Fehler, läuft aber weiter,
 # [ -e ~/bin/testbinary.include ] && source ~/bin/testbinary.include || echo "~/bin/testbinary.include not found"
 # wenn die Funktion nicht eingebunden wurde, Fehler auswerfen, aber weiter machen
 #declare -f testbinary > /dev/null && testbinary -b realpath file sort uniq basename dirname tr grep awk ls mv mkdir rm cp pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert
@@ -104,23 +104,23 @@ if [ -e "${1}" ] # wenn Datei existiert
     # Was soll mit der Datei gemacht werden
     # und alles in GROSSBUCHSTABEN
     TOOL=`echo "${2}" | tr '[:lower:]' '[:upper:]'`
-    # wenn 3. Parameter vorhanden und natuerliche Zahl
+    # wenn 3. Parameter vorhanden und natürliche Zahl
     # zwischen 149 und 601, verändere PARAM3 auf diese Zahl
     # wenn keine nat. Zahl, dann speichere den Inhalt in PARAM4
     [ $ARGSCOUNT -gt 2 ] && [[ "${3}" =~ ^[0-9]+$ ]] && [ $3 -gt 149 ] && [ $3 -lt 601 ] && PARAM3=$3 || PARAM4="${3}"
-    # ist da noch ein vierter Parameter, nimm den fuer PARAM4
+    # ist da noch ein vierter Parameter, nimm den für PARAM4
     [ $ARGSCOUNT -gt 3 ] && PARAM4="${4}" 
-    # Umrechnungsfaktor DTP-Punkt im mm fuer die Ausgaben mit awk der Seitenformate
+    # Umrechnungsfaktor DTP-Punkt im mm für die Ausgaben mit awk der Seitenformate
     UF=0.3528
     # Formatbreite feststellen
     BREITE=`pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$3*f}'`
-    # Formathoehe feststellen
+    # Formathöhe feststellen
     HOEHE=`pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$5*f}'`
     # HF oder QF
-    # todo: HF und QF muessen sich eigentlich um 2cm unterscheiden,
-    # sonst ist es per Definition ein quadratischens Format,
-    [ $BREITE -gt $HOEHE ] && QF=1 || QF=0 # Datei ist Querformat oder quadratisch bzw Hochformat
-    # dann Variablendefinition folgendermassen aender:
+    # TODO : HF und QF müssen sich eigentlich um 2cm unterscheiden,
+    # sonst ist es per Definition ein quadratisches Format,
+    [ $BREITE -gt $HOEHE ] && QF=1 || QF=0 # Datei ist Querformat oder quadratisch bzw. Hochformat
+    # dann Variablendefinition folgendermaßen ändern:
     # quadratisches Format QF=0, Querformat QF=1, Hochformat QF=2
     # in den Pfad der Originaldatei wechseln
     cd "${PFAD}"
@@ -152,15 +152,15 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
     do 
     # den Text extrahieren
     ${SCRIPTNAME} "${i}" TEXTEXT
-    # in Unteverzeichnis verschieben
+    # in Unterverzeichnis verschieben
     mv *.txt "${DIRTXT}/"
     # eine SVG-Datei erstellen
     pdftocairo -svg "${i}" "${i%.*}.svg"
-    # in Unteverzeichnis verschieben
+    # in Unterverzeichnis verschieben
     mv *.svg "${DIRVECTOR}/"
     # eine PostScript-Datei erstellen
     pdftops "${i}" 
-    # in Unteverzeichnis verschieben
+    # in Unterverzeichnis verschieben
     mv *.ps "${DIRVECTOR}/"
     # Einzelseite in Backupverzeichnis verschieben
     mv "${i}" "${DIRBCKUP}/"
@@ -171,7 +171,7 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   # und extrahierten Gesamttext in Unterverzeichnis verschieben
   mv *.txt "${DIRTXT}/"
   
-  #todo: Tabellen aus PDF extrahieren siehe TEXTEXT)
+  #TODO: Tabellen aus PDF extrahieren siehe TEXTEXT)
   
   # extrahiere alle Bilder 
   ${SCRIPTNAME} "${DNAME}" IMGEXT
@@ -199,18 +199,18 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   # Kerning-Daten aus *.PFM fehlen, aber mehr gibts nicht
   # kann man zwar selbst generieren, aber die haben mit
   # ordentlichem Kerning nix zu tun
-  # dafuer kann ich sehen, welche Zeichen in der Datei enthalten sind
+  # dafür kann ich sehen, welche Zeichen in der Datei enthalten sind
   for i in `ls *.cff`; do cfftot1 "${i}" "${i%.*}.pfb"; done
   # Schriftdateien in Unterverzeichnis verschieben (das ist alles,
-  # was mir an Font-Dateien einfaellt, was man einbetten koennte)
+  # was mir an Font-Dateien einfällt, was man einbetten könnte)
   # da bin ich mir aber nicht ganz sicher
   for i in `ls *.?tf *.odttf *.cff *.pf? *.tfm *.fon *.a?f* *.afm *.dfont *.fnt *.lwfn`; do mv "${i}" "${DIRFONTS}/"; done
-  # alles andere bis auf die Originalpdf wieder loeschen
+  # alles andere bis auf die Originalpdf wieder löschen
   for i in `ls -p --hide=*.pdf | grep -v '/$'`; do rm "${i}"; done
   
-  # extrahiere alle Dateianhaenge
+  # extrahiere alle Dateianhänge
   ${SCRIPTNAME} "${DNAME}" DETACH
-  # und verschiebe alles was hier jetzt liegt ausser der PDF in Unterverzeichnis
+  # und verschiebe alles was hier jetzt liegt außer der PDF in Unterverzeichnis
   for i in `ls -p --hide=*.pdf | grep -v '/$'`; do mv "${i}" "${DIRATTACH}/"; done
   
   # allgemeine Informationen aus der PDF extrahieren
@@ -223,17 +223,17 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   mv *.* "${DIRBCKORIG}/"
   ;;
   
-INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
+INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   # eingebettete oder genutzte oder auch substituierte Schriften und Subsets,
   # eingebettete Bilder,
   # eingebettete Dateien, 
-  # angehaengte Dateien
+  # angehängte Dateien
   # allgemeine Informationen
-  # Masse aller Seiten von Media-, Bleed-, Trim-, (Trim=Crop-,) (Art- oder Bounding-) Box,
+  # Maße aller Seiten von Media-, Bleed-, Trim-, (Trim=Crop-,) (Art- oder Bounding-) Box,
   # eingebettetes JavaScript
   # enthaltene Strukturinformationen ohne Textdaten
   
-  # Name fuer die Info.Datei festlegen
+  # Name für die Info.Datei festlegen
   TMPDATEI="${DATEI}info"
   # sind Tags in der Datei?
   GETAGGT=`pdfinfo "${DATEI}" | grep Tag | awk '{ print $2 }'`
@@ -244,7 +244,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
   echo "Informationen zu --- <${DATEI}> ---" > "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
   
-  # wenn Schriften genutz wurden und in irgendeiner Art in der Datei eingebunden sind
+  # wenn Schriften genutzt wurden und in irgendeiner Art in der Datei eingebunden sind
   # oder vergessen wurden einzubetten und substituiert werden, dann zeige diese
   if pdffonts "${DATEI}" | egrep '.*(yes|no).*' > /dev/null
     then
@@ -256,7 +256,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
     echo "." >> "${TMPDATEI}"
     fi
   
-  # Listet alle enthaltenen Bilder und Masken mit Rendering intent, Aufloesung und Pixelzahl auf
+  # Listet alle enthaltenen Bilder und Masken mit Rendering intent, Auflösung und Pixelzahl auf
   # und auf welcher Seite sie sind, aber nur wenn auch welche drin sind...
   if pdfimages -list "${DATEI}" | grep 0 > /dev/null
     then
@@ -267,7 +267,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
   
   # Definierte Sonderfarben (geht auch aus der PDF-Datei mit grep im Binarymodus,
   # ist aber einfacher aus der PostScript-Datei zu holen
-  # todo: findet nicht wirklich alles, aber ist ein Anfang
+  # TODO: findet nicht wirklich alles, aber ist ein Anfang
   pdftops "${DATEI}" /tmp/"${DNAMENOEXT}".ps
   if grep Separation /tmp/"${DNAMENOEXT}".ps > /dev/null
     then
@@ -277,23 +277,23 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
     fi
   rm /tmp/"${DNAMENOEXT}".ps
   
-  # alle enthaltenen, angehaengten Dateien auflisten
+  # alle enthaltenen, angehängten Dateien auflisten
   echo "-------------------- enthaltene Dateien --------------------" >> "${TMPDATEI}"
   pdfdetach -list "${DATEI}" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
   
   # liste allgemeine Informationen auf
   echo "-------------------- Allgemeine Infos ----------------------" >> "${TMPDATEI}"
-  # Ersteller, genutztes Programm, Farbmanagement-Bibliothem, PDF-Version, usw
-  pdfinfo "${DATEI}" >> "${TMPDATEI}"  # wenn es nur die PDF-Version sein muesste, dann wuerde file "${DATEI}" genuegen
-  # PDF/X-Konformitaet feststellen
+  # Ersteller, genutztes Programm, Farbmanagement-Bibliotheken, PDF-Version, usw.
+  pdfinfo "${DATEI}" >> "${TMPDATEI}"  # wenn es nur die PDF-Version sein müsste, dann würde file "${DATEI}" genügen
+  # PDF/X-Konformität feststellen
   PDFX=`pdfinfo -meta "${DATEI}" | grep pdfx | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /'`
   echo "PDF-X ID / Version / Conformance:${PDFX}" >> "${TMPDATEI}"
   # Definierte Darstellungsklasse
   PDFX=`pdfinfo -meta "${DATEI}" | grep endition | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /'`
   echo "Rendition-Class: ${PDFX}" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
-  # Wurde die Datei mit Ueberfuellungen erstellt oder ohne
+  # Wurde die Datei mit ÜberfÜllungen erstellt oder ohne
   podofopdfinfo C "${DATEI}" | grep Trapped | tr -d '\t' >> "${TMPDATEI}"
   # | awk '{printf "%-31s %s\n",$1,$2}' >> "${TMPDATEI}"
   # Liste auf, was mit der Datei alles gemacht werden darf
@@ -322,7 +322,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei ueber:
     pdfinfo -f "${i}" -l "${i}" -box "${DATEI}" | grep Page.*rot >> "${TMPDATEI}"
     # Seitenformat in mm
     pdfinfo -f "${i}" -l "${i}" -box "${DATEI}" | grep Page.*size | awk -v f=$UF '{printf "%s %4.0f size: %4.0f x %4.0f mm %s\n",$1,$2,$4*f,$6*f,$8}' >> "${TMPDATEI}"
-    # Boxen der Seite mit Massen zum Nullpunkt (linke obere Ecke der Seite)
+    # Boxen der Seite mit Maßen zum Nullpunkt (linke obere Ecke der Seite)
     pdfinfo -f "${i}" -l "${i}" -box "${DATEI}" | grep Box | awk -v f=$UF '{printf "%s %4.0f %-9s %5.0f %8.0f %8.0f %8.0f  --> %5.0f x %5.0f\n",$1,$2,$3,$4*f,$5*f,$6*f,$7*f,($6-$4)*f,($7-$5)*f }' >> "${TMPDATEI}"
     # und jetzt in pts
     pdfinfo -f "${i}" -l "${i}" -box "${DATEI}" | grep Page.*size >> "${TMPDATEI}"
@@ -361,7 +361,7 @@ SEPPAGES) # zerlegt mehrseitige PDF-Dateien in Einzelseiten
   pdfseparate "${DATEI}" "${PFAD}/${DNAMENOEXT}-Seite-"%04d.pdf
   ;;
   
-DETACH) # extrahiert alle angehaengten/eingebetteten Dateien
+DETACH) # extrahiert alle angehängten/eingebetteten Dateien
   pdfdetach -saveall "${DATEI}"
   ;;
   
@@ -380,7 +380,7 @@ PS) # wandelt die PDF-Datei in eine PostScript-Datei um
 PDFA1B) # erstellt neue PDF-Datei in PDF-A-1b-Format
   # dazu erst mal eine PostScript-Datei erstellen
   pdftops "${DATEI}"
-  # die PostScrip-Datei dann als PDFA1B erstellen
+  # die PostScript-Datei dann als PDFA1B erstellen
   gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -sOutputFile="${DNAMENOEXT}-A1b.pdf" "${DNAMENOEXT}".ps
   # PostScript-Datei wieder loeschen
   rm -rf "${DNAMENOEXT}".ps
@@ -398,7 +398,7 @@ ROTD) # alle Seiten um 180 Grad drehen
   pdftk "${DATEI}" cat 1-enddown output "${DNAMENOEXT}"-ROT180.pdf
   ;;
   
-REVERSE) # Seitentreihenfolge umkehren
+REVERSE) # Seitenreihenfolge umkehren
   pdftk "${DATEI}" cat r1-rend output  "${DNAMENOEXT}"-REVERSE.pdf
   ;;
   
@@ -409,16 +409,16 @@ M2S) # erstelle PDF mit 2 Seiten pro Blatt
     ${SCRIPTNAME} "${DATEI}" ROTL
     # jeweils 2 Seiten zusammenbasteln aus der rotierten Datei und in eine neue Datei schreiben
     pdfjam --suffix 2pg --nup 2x1 --landscape --frame true "${DNAMENOEXT}"-ROTL.pdf
-    # erste rotierte datei loeschen
+    # erste rotierte Datei löschen
     rm -rf "${DNAMENOEXT}"-ROTL.pdf
     # die zweiseitige Datei jetzt wieder 90° nach rechts rotieren
     ${SCRIPTNAME} "${DNAMENOEXT}"-ROTL-2pg.pdf ROTR 
-    # loesche die linksrotierte Datei 
+    # lösche die linksrotierte Datei 
     rm -rf "${DNAMENOEXT}"-ROTL-2pg.pdf
     # benenne die entstandene zweiseitige Datei um
     mv "${DNAMENOEXT}"-ROTL-2pg-ROTR.pdf "${DNAMENOEXT}"-2pg.pdf
-    # ich weiss nicht mehr warum, aber wenn ich das nicht bzw. auf andere Weise mache,
-    # hat es beim Querformat jedes mal wie Scheisse ausgesehen
+    # ich weiß nicht mehr warum, aber wenn ich das nicht bzw. auf andere Weise mache,
+    # hat es beim Querformat jedes mal wie Scheiße ausgesehen
     else
     # Hochformat braucht den Quatsch oben nicht
     pdfjam --suffix 2pg --nup 2x1 --landscape --frame true "${DATEI}"
@@ -458,29 +458,29 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
   <PDF-Dokument> --> eine PDF-Datei beliebigen Formates / beliebiger Version
   
   moegliche Werte PARAMETER1:
-  INFO     --> 	ermittelt soviele Informationen wie moeglich schreibt
+  INFO     --> 	ermittelt soviele Informationen wie möglich schreibt
          		sie in Dateiname.pdfinfo
   TEXTEXT  --> 	extrahiert den in der PDF-Datei enthaltenen Text
 		        in Dateiname.txt
 	        Zur Texterkennung per OCR muss mindestens PARAMETER2
 	        angegeben werden:
-                    wird PARAMETER2 angegeben und ist eine natuerliche
-                    Zahl zwischen 150 und 600 wird er als dpi-Angabe fuer die
+                    wird PARAMETER2 angegeben und ist eine natürliche
+                    Zahl zwischen 150 und 600 wird er als dpi-Angabe für die
                     Texterkennung per OCR interpretiert.
                     Sollte PARAMETER2 keine nat. Zahl sein, wird er als
-                    Sprachangabe fuer die Texterkennung per OCR
-                    interpretiert und Standardaufloesung (150dpi) gesetzt.
+                    Sprachangabe für die Texterkennung per OCR
+                    interpretiert und Standardauflösung (150dpi) gesetzt.
                     Wird PARAMETER3 angegeben, wird dieser als 
-                    Sprachangabe fuer die Texterkennung genutzt.
+                    Sprachangabe für die Texterkennung genutzt.
                     Ansonsten wird als Standardsprache deutsch (deu) genutzt
   IMGEXT   --> 	extrahiert alle im PDF-Dokument vorhandenen Bilder in
-                Originalaufloesung nach dem Schema:
+                Originalauflösung nach dem Schema:
 	                    Dateiname-Seitenzahl-Bildnummer.[png|tiff|jpg|jp2|ppm]
 	        und extrahiert aus den Bildern vorhandene Farbprofile
   SEPPAGES --> 	Erstellt aus jeder Seite der PDF-Datei ein eigenes PDF-Dokument
                 nach dem Schema Dateiname-Seitenzahl.pdf
-  DETACH   --> 	extrahiert alle Dateianhaenge (falls denn welche existieren)
-  ATTACH   --> 	haengt eine Datei als Attachment an die PDF-Datei an
+  DETACH   --> 	extrahiert alle Dateianhänge (falls denn welche existieren)
+  ATTACH   --> 	hängt eine Datei als Attachment an die PDF-Datei an
                 (das Original der angehaengten Datei wird geloescht)
   HTML     --> 	Erstellt aus der PDF-Datei ein HTML-Dokument (nicht schoen)
   PS       --> 	Erstellt aus der PDF-Datei eine PostScript-Datei
