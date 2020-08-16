@@ -1,5 +1,5 @@
 # myPDF-Tool
-Script zur Aanalyse und Modifikation einer PDF-Datei
+Script zur Analyse und Modifikation einer PDF-Datei
 ergänzt um Scripte und Aktionen für Kontextmenüs von Dateimanagern (Dolphin, Nemo)
 
 - verschiedene Menüaktionen mit PDF-Dateien
@@ -12,12 +12,12 @@ zur Installation benötigt. In jedem Verzeichnis liegt eine Datei _install_.
 Der Aufruf erfolgt im Terminal mit
 
 ```
-user@linux:~/Pfad/zu/den/entpackten/Dateien/maPDF-Tool> bash ./install
+user@linux:~/Pfad/zu/den/entpackten/Dateien/myPDF-Tool> bash ./install
 ```
 
 * install (Bash-Script) - Installiert Scripte und Menüs für den angemeldeten Nutzer
 
-* ksm_pdf_tool (Bash-Script) - kan folgende Dinge mit PDF-Dateien tun:
+* ksm_pdf_tool (Bash-Script) - kann folgende Dinge mit PDF-Dateien tun:
 
   Aufruf:
 ```  
@@ -97,10 +97,10 @@ user@linux:~/Pfad/zu/den/entpackten/Dateien/maPDF-Tool> bash ./install
 
   Benoetigt werden folgende Programme:
   
-  realpath, basename, dirname, tr, grep, awk, ls, mv, mkdir, rm, cp, sort, file,
+  realpath, basename, dirname, tr, grep, awk, sort, file,
   uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
   pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
-  pdfjam, cfftot1, mutool, tesseract, qpdf, convert, rsync
+  pdfjam, cfftot1, mutool, tesseract, qpdf, convert
   
 
 * nemo_pdf_tool_wrapper (Bash-Script) - ruft für jede als Parameter übergebene Datei das Script _ksm_pdf_tool_ auf und 
@@ -115,7 +115,7 @@ unter Nemo eine Mehrfachselektion zu ermöglichen, da _ksm_pdf_tool_ nur eine Da
 
 * pdf_tool_html.nemo_action - ruft das Script _nemowrapper_pdftool_ mit dem Parameter HTML und allen markierten Dateien auf
 
-* df_tool_imgext.nemo_action - ruft das Script _nemowrapper_pdftool_ mit dem Parameter IMGEXT und allen markierten Dateien auf
+* pdf_tool_imgext.nemo_action - ruft das Script _nemowrapper_pdftool_ mit dem Parameter IMGEXT und allen markierten Dateien auf
 
 * pdf_tool_info.nemo_action - ruft das Script _nemowrapper_pdftool_ mit dem Parameter INFO und allen markierten Dateien auf
 
