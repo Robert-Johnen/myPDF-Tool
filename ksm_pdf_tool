@@ -103,7 +103,8 @@ if [ -e "${1}" ] # wenn Datei existiert
     NPFAD="${PFAD}/${DNAMENOEXT}"
     # Was soll mit der Datei gemacht werden
     # und alles in GROSSBUCHSTABEN
-    TOOL=`echo "${2}" | tr '[:lower:]' '[:upper:]'`
+#    TOOL=`echo "${2}" | tr '[:lower:]' '[:upper:]'` # das hier ist auf jeden Fall portabel
+    TOOL="${2^^}" # das hier ist ein Bash-Konstrukt um alle Buchstaben in Versalien zu wandeln
     # wenn 3. Parameter vorhanden und natürliche Zahl
     # zwischen 149 und 601, verändere PARAM3 auf diese Zahl
     # wenn keine nat. Zahl, dann speichere den Inhalt in PARAM4
