@@ -40,7 +40,7 @@ DIRBCKORIG="${DIRBCKUP}/Rohdaten"    # Verzeichnis für Originaldaten
 DIRIMGS="Bilddaten"                  # Verzeichnis für Bilder
 DIRANIM="${DIRIMGS}/Animationen"     # Verzeichnis für Animationsdaten
 DIRVECTOR="${DIRIMGS}/Grafiken"      # Verzeichnis für Vektordaten
-DIRPALETTES="${DIRIMGS}/Paletten"    # Verzeichnis für Farbpaletten 
+DIRPALETTES="${DIRIMGS}/Paletten"    # Verzeichnis für Farbpaletten
 DIRPROFILES="${DIRIMGS}/Profile"     # Verzeichnis für Farbprofile
 DIRVIDEOS="${DIRIMGS}/Videos"        # Verzeichnis für Videodaten
 DIRATTACH="Dateianhaenge"            # Verzeichnis für Dateianhänge
@@ -51,13 +51,13 @@ DIRFONTS="${DIRTXT}/Schriften"       # Verzeichnis für Fontdateien
 DIRSTYLES="${DIRTXT}/Stile"          # Verzeichnis für Stilvorlagen
 DIRGRIDS="${DIRTXT}/Tabellen"        # Verzeichnis für Tabellen
 
-# mit cp -rf die Verzeichnisstruktur aus einer Vorlage kopieren, dann 
+# mit cp -rf die Verzeichnisstruktur aus einer Vorlage kopieren, dann
 # aus dieser Variable
 DIRSTRUCT="${HOME}/Oeffentlich/Vorlagen/scribus/NEU"
 
 # Standardauflösung für Bilder in dpi
 PARAM3=150
-# Standardsprache für Texterkennung 
+# Standardsprache für Texterkennung
 PARAM4="deu"
 
 #--------------------------------------------------------------------------------------#
@@ -110,7 +110,7 @@ if [ -e "${1}" ] # wenn Datei existiert
     # wenn keine nat. Zahl, dann speichere den Inhalt in PARAM4
     [ $ARGSCOUNT -gt 2 ] && [[ "${3}" =~ ^[0-9]+$ ]] && [ $3 -gt 149 ] && [ $3 -lt 601 ] && PARAM3=$3 || PARAM4="${3}"
     # ist da noch ein vierter Parameter, nimm den für PARAM4
-    [ $ARGSCOUNT -gt 3 ] && PARAM4="${4}" 
+    [ $ARGSCOUNT -gt 3 ] && PARAM4="${4}"
     # Umrechnungsfaktor DTP-Punkt im mm für die Ausgaben mit awk der Seitenformate
     UF=0.3528
     # Formatbreite feststellen
@@ -138,11 +138,11 @@ if [ -e "${1}" ] # wenn Datei existiert
 #------------------------------------ Hauptprogramm -----------------------------------#
 #--------------------------------------------------------------------------------------#
 # je nach Taetigkeit anderes Feld ausfuehren
-case ${TOOL} in 
+case ${TOOL} in
 ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzeichnis
   # erstelle Verzeichnisstruktur entweder mit cp -rf aus Verzeichnisbaum oder mit mkdir -p wenn Vorlagenverzeichnis nicht existent
   [ -d "${DIRSTRUCT}" ] && cp -rf "${DIRSTRUCT}" "${DNAMENOEXT}" || mkdir -p "${DIRMIDI}" "${DIRSNDFONT}" "${DIROUTPUT}" "${DIRBCKORIG}" "${DIRANIM}" "${DIRVECTOR}" "${DIRPALETTES}" "${DIRPROFILES}" "${DIRVIDEOS}" "${DIRATTACH}" "${DIRSERIAL}" "${DIRHTML}" "${DIRFONTS}" "${DIRSTYLES}" "${DIRGRIDS}"
-  # wechsele dann hinein 
+  # wechsele dann hinein
   cd "${DNAMENOEXT}"
   # und kopiere die Originaldatei hinein
   cp "../${DNAME}" "${DNAME}"
@@ -150,7 +150,7 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   ${SCRIPTNAME} "${DNAME}" SEPPAGES
   # aus jeder Einzelseite
   for i in `ls *-????.pdf`
-    do 
+    do
     # den Text extrahieren
     ${SCRIPTNAME} "${i}" TEXTEXT
     # in Unterverzeichnis verschieben
@@ -160,21 +160,21 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
     # in Unterverzeichnis verschieben
     mv *.svg "${DIRVECTOR}/"
     # eine PostScript-Datei erstellen
-    pdftops "${i}" 
+    pdftops "${i}"
     # in Unterverzeichnis verschieben
     mv *.ps "${DIRVECTOR}/"
     # Einzelseite in Backupverzeichnis verschieben
     mv "${i}" "${DIRBCKUP}/"
     done
-    
+
   # Gesamttext aus Originaldatei extrahieren
   ${SCRIPTNAME} "${DNAME}" TEXTEXT
   # und extrahierten Gesamttext in Unterverzeichnis verschieben
   mv *.txt "${DIRTXT}/"
-  
+
   #TODO: Tabellen aus PDF extrahieren siehe TEXTEXT)
-  
-  # extrahiere alle Bilder 
+
+  # extrahiere alle Bilder
   ${SCRIPTNAME} "${DNAME}" IMGEXT
   # mit jedem Bild
   for i in `ls -p --hide=*.pdf | grep -v '/$'`
@@ -186,12 +186,12 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
     # verarbeitetes Bild in Bildordner verschieben
     mv "${i}" "${DIRIMGS}/"
     done
-    
+
   # Wandle gesamte PDF in HTML um
   pdftohtml "${DNAME}"
   # und verschiebe das ganze HTML-Gedoens in Unterverzeichnis
   for i in `ls -p --hide=*.pdf | grep -v '/$'`; do mv "${i}" "${DIRHTML}/"; done
-  
+
   # Schriften extrahieren
   # extrahiere alles --> ist die einzige Methode, die ich kenne um
   # auch die eingebetteten Schriften aus der PDF raus zu bekommen
@@ -208,12 +208,12 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   for i in `ls *.?tf *.odttf *.cff *.pf? *.tfm *.fon *.a?f* *.afm *.dfont *.fnt *.lwfn`; do mv "${i}" "${DIRFONTS}/"; done
   # alles andere bis auf die Originalpdf wieder löschen
   for i in `ls -p --hide=*.pdf | grep -v '/$'`; do rm "${i}"; done
-  
+
   # extrahiere alle Dateianhänge
   ${SCRIPTNAME} "${DNAME}" DETACH
   # und verschiebe alles was hier jetzt liegt außer der PDF in Unterverzeichnis
   for i in `ls -p --hide=*.pdf | grep -v '/$'`; do mv "${i}" "${DIRATTACH}/"; done
-  
+
   # allgemeine Informationen aus der PDF extrahieren
   ${SCRIPTNAME} "${DNAME}" INFO
   # Originaldatei in PostScript umwandeln
@@ -223,17 +223,17 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   # Verschiebe die ins Unterverzeichnis
   mv *.* "${DIRBCKORIG}/"
   ;;
-  
+
 INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   # eingebettete oder genutzte oder auch substituierte Schriften und Subsets,
   # eingebettete Bilder,
-  # eingebettete Dateien, 
+  # eingebettete Dateien,
   # angehängte Dateien
   # allgemeine Informationen
   # Maße aller Seiten von Media-, Bleed-, Trim-, (Trim=Crop-,) (Art- oder Bounding-) Box,
   # eingebettetes JavaScript
   # enthaltene Strukturinformationen ohne Textdaten
-  
+
   # Name für die Info.Datei festlegen
   TMPDATEI="${DATEI}info"
   # sind Tags in der Datei?
@@ -244,7 +244,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   LSEITE=`pdfinfo "${DATEI}" | grep Pages | awk '{ print $2 }'`
   echo "Informationen zu --- <${DATEI}> ---" > "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
-  
+
   # wenn Schriften genutzt wurden und in irgendeiner Art in der Datei eingebunden sind
   # oder vergessen wurden einzubetten und substituiert werden, dann zeige diese
   if pdffonts "${DATEI}" | egrep '.*(yes|no).*' > /dev/null
@@ -256,7 +256,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
     pdffonts -subst "${DATEI}" >> "${TMPDATEI}"
     echo "." >> "${TMPDATEI}"
     fi
-  
+
   # Listet alle enthaltenen Bilder und Masken mit Rendering intent, Auflösung und Pixelzahl auf
   # und auf welcher Seite sie sind, aber nur wenn auch welche drin sind...
   if pdfimages -list "${DATEI}" | grep 0 > /dev/null
@@ -265,7 +265,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
     pdfimages -list "${DATEI}" >> "${TMPDATEI}"
     echo "." >> "${TMPDATEI}"
     fi
-  
+
   # Definierte Sonderfarben (geht auch aus der PDF-Datei mit grep im Binarymodus,
   # ist aber einfacher aus der PostScript-Datei zu holen
   # TODO: findet nicht wirklich alles, aber ist ein Anfang
@@ -277,12 +277,12 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
     echo "." >> "${TMPDATEI}"
     fi
   rm /tmp/"${DNAMENOEXT}".ps
-  
+
   # alle enthaltenen, angehängten Dateien auflisten
   echo "-------------------- enthaltene Dateien --------------------" >> "${TMPDATEI}"
   pdfdetach -list "${DATEI}" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
-  
+
   # liste allgemeine Informationen auf
   echo "-------------------- Allgemeine Infos ----------------------" >> "${TMPDATEI}"
   # Ersteller, genutztes Programm, Farbmanagement-Bibliotheken, PDF-Version, usw.
@@ -314,7 +314,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   echo "Umrechnungsfaktor: pts x $UF = mm" >> "${TMPDATEI}"
   echo "alle Ergebnisse in mm sind gerundet" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
-  
+
   # Analyse der Einzelseiten
   echo "----------- Informationen zu den einzelnen Seiten ----------" >> "${TMPDATEI}"
   for i in $( seq 1 ${LSEITE} )
@@ -330,7 +330,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
     pdfinfo -f "${i}" -l "${i}" -box "${DATEI}" | grep Box >> "${TMPDATEI}"
     echo "." >> "${TMPDATEI}"
     done
-    
+
   # wurde JavaScript genutzt
   if [ "${JAVASCRIPT}" != "no" ]
     then
@@ -357,27 +357,36 @@ TEXTEXT) # extrahiert den Textteil der PDF-Datei
 IMGEXT) # extrahiert alle Bilder aus der PDF-Datei
   pdfimages -all -p "${DATEI}" "${DNAMENOEXT}"
   ;;
-  
+
 SEPPAGES) # zerlegt mehrseitige PDF-Dateien in Einzelseiten
   pdfseparate "${DATEI}" "${PFAD}/${DNAMENOEXT}-Seite-"%04d.pdf
+  ;;
+
+COLSEP)
+  gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=tiffsep -r300 -sOutputFile="${DNAMENOEXT}".cmyk. "${DATEI}"
+  for i in `ls *.cmyk.*`
+    do 
+    tiff2pdf "${i}" -o "${i}.pdf" && rm "${i}"
+    done
+  pdftk "${DATEI}" "${DNAMENOEXT}.cmyk."*.tif.pdf cat output "${DNAMENOEXT}-CMYK.pdf" && rm *.cmyk.*
   ;;
   
 DETACH) # extrahiert alle angehängten/eingebetteten Dateien
   pdfdetach -saveall "${DATEI}"
   ;;
-  
+
 ATTACH) # bettet Datei(en) in eine PDF-Datei ein
   pdftk "${DATEI}" attach_file "${PARAM4}" output "${PFAD}/${DNAMENOEXT}-att.pdf" && mv "${PFAD}/${DNAMENOEXT}-att.pdf" "${DATEI}" && rm "${PARAM4}"
   ;;
-  
+
 HTML) # wandelt die PDF-Datei in ein HTML-Archiv um
   pdftohtml "${DATEI}"
   ;;
-  
+
 PS) # wandelt die PDF-Datei in eine PostScript-Datei um
   pdftops "${DATEI}"
   ;;
-  
+
 PDFA1B) # erstellt neue PDF-Datei in PDF-A-1b-Format
   # dazu erst mal eine PostScript-Datei erstellen
   pdftops "${DATEI}"
@@ -386,23 +395,23 @@ PDFA1B) # erstellt neue PDF-Datei in PDF-A-1b-Format
   # PostScript-Datei wieder loeschen
   rm -rf "${DNAMENOEXT}".ps
   ;;
-  
+
 ROTL) # alle Seiten um 90 Grad gegen den UZS drehen
   pdftk "${DATEI}" cat 1-endleft output "${DNAMENOEXT}"-ROT90.pdf
   ;;
-  
+
 ROTR) # alle Seiten um 90 Grad im UZS drehen
   pdftk "${DATEI}" cat 1-endright output "${DNAMENOEXT}"-ROT270.pdf
   ;;
-  
+
 ROTD) # alle Seiten um 180 Grad drehen
   pdftk "${DATEI}" cat 1-enddown output "${DNAMENOEXT}"-ROT180.pdf
   ;;
-  
+
 REVERSE) # Seitenreihenfolge umkehren
   pdftk "${DATEI}" cat r1-rend output  "${DNAMENOEXT}"-REVERSE.pdf
   ;;
-  
+
 M2S) # erstelle PDF mit 2 Seiten pro Blatt
   if [ $QF -eq 1 ] # ist die Datei ein Querformat
     then
@@ -413,8 +422,8 @@ M2S) # erstelle PDF mit 2 Seiten pro Blatt
     # erste rotierte Datei löschen
     rm -rf "${DNAMENOEXT}"-ROTL.pdf
     # die zweiseitige Datei jetzt wieder 90° nach rechts rotieren
-    ${SCRIPTNAME} "${DNAMENOEXT}"-ROTL-2pg.pdf ROTR 
-    # lösche die linksrotierte Datei 
+    ${SCRIPTNAME} "${DNAMENOEXT}"-ROTL-2pg.pdf ROTR
+    # lösche die linksrotierte Datei
     rm -rf "${DNAMENOEXT}"-ROTL-2pg.pdf
     # benenne die entstandene zweiseitige Datei um
     mv "${DNAMENOEXT}"-ROTL-2pg-ROTR.pdf "${DNAMENOEXT}"-2pg.pdf
@@ -425,39 +434,39 @@ M2S) # erstelle PDF mit 2 Seiten pro Blatt
     pdfjam --suffix 2pg --nup 2x1 --landscape --frame true "${DATEI}"
     fi
   ;;
-  
+
 M4S) # erstelle PDF mit 4 Seiten pro Blatt
   # auch hier muss ich zwischen Hoch und Querformat unterscheiden
   # kann mir aber den Quatsch oben aus dem QF sparen
   [ $QF -eq 1 ] && pdfjam --suffix 4pg --nup 2x2 --landscape --frame true "${DATEI}" || pdfjam --suffix 4pg --nup 2x2 --frame true "${DATEI}"
   ;;
-  
-ALLFEAT) # Alle Features der PDF-Datei einschalten 
+
+ALLFEAT) # Alle Features der PDF-Datei einschalten
   # erstellt eine Datei ohne Owner-Passwort --> klappt nur, wenn kein User-Passwort gesetzt
   qpdf --decrypt "${DATEI}" "${DNAMENOEXT}"-NOPWD.pdf
   # jetzt bastele daraus eine PDF, mit der alles erlaubt ist
   pdftk "${DNAMENOEXT}"-NOPWD.pdf output "${DNAMENOEXT}"-AFA.pdf allow AllFeatures && rm -rf "${DNAMENOEXT}"-NOPWD.pdf
   # alternative:
   # gs -sPDFPasword=$PASS -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -r300 -sOutputFile="${DNAMENOEXT}"-AFA.pdf -c .setpdfwrite -f "${DATEI}"
-  # 
+  #
   ;;
-  
+
 CONVPNG) # konvertiert alle Seiten zu PNG-Pixelgrafik mit der angegebenen Aufloesung
   convert -density "${PARAM3}" "${DATEI}" -quality 100 "${DNAMENOEXT}".png
   ;;
-  
+
 CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloesung
   convert -density "${PARAM3}" "${DATEI}" -quality 100 "${DNAMENOEXT}".jpg
   ;;
-  
+
 *) # tue nichts ;-)
   cat << EOF
-  
+
   Aufruf:
   user@linux:~> ${SCRIPTNAME} <PDF-Dokument> PARAMETER1 PARAMETER2 PARAMETER3
-  
+
   <PDF-Dokument> --> eine PDF-Datei beliebigen Formates / beliebiger Version
-  
+
   moegliche Werte PARAMETER1:
   INFO     --> 	ermittelt soviele Informationen wie möglich schreibt
          		sie in Dateiname.pdfinfo
@@ -471,7 +480,7 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
                     Sollte PARAMETER2 keine nat. Zahl sein, wird er als
                     Sprachangabe für die Texterkennung per OCR
                     interpretiert und Standardauflösung (150dpi) gesetzt.
-                    Wird PARAMETER3 angegeben, wird dieser als 
+                    Wird PARAMETER3 angegeben, wird dieser als
                     Sprachangabe für die Texterkennung genutzt.
                     Ansonsten wird als Standardsprache deutsch (deu) genutzt
   IMGEXT   --> 	extrahiert alle im PDF-Dokument vorhandenen Bilder in
@@ -496,7 +505,7 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
                 im Verhaeltnis zur Ausrichtung der Originaldatei
   ROTR     --> 	rotiert alle Seiten um 90° im Uhrzeigersinn
                 im Verhaeltnis zur Ausrichtung der Originaldatei
-  ROTD     --> 	rotiert alle Seiten um 180° 
+  ROTD     --> 	rotiert alle Seiten um 180°
                 im Verhaeltnis zur Ausrichtung der Originaldatei
   REVERSE  -->	kehrt die Seitenreihenfolge um
   M2S      --> 	erstelle PDF mit 2 Seiten pro Blatt
@@ -517,8 +526,8 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
   uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
   pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
   pdfjam, cfftot1, mutool, tesseract, qpdf, convert
-  
+
 EOF
  ;;
- 
+
 esac
