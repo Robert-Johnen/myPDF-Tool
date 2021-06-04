@@ -90,11 +90,11 @@ if [ -e "${1}" ] # wenn Datei existiert
   if file "${1}" | grep "PDF document" # und Datei ist auch ein PDF-Dokument
     then
     # Parameter mit echtem Pfad der Datei speichern
-    DATEI=`realpath "${1}"`
+    DATEI=$(realpath "${1}")
     # Dateiname mit Erweiterung ermitteln
-    DNAME=`basename "${DATEI}"`
+    DNAME=$(basename "${DATEI}")
     # Reinen Pfad extrahieren
-    PFAD=`dirname "${DATEI}"`
+    PFAD=$(dirname "${DATEI}")
     # Dateiname ohnen Erweiterung
     DNAMENOEXT="${DNAME%.*}"
     # nur die Extension
@@ -103,20 +103,20 @@ if [ -e "${1}" ] # wenn Datei existiert
     NPFAD="${PFAD}/${DNAMENOEXT}"
     # Was soll mit der Datei gemacht werden
     # und alles in GROSSBUCHSTABEN
-#    TOOL=`echo "${2}" | tr '[:lower:]' '[:upper:]'` # das hier ist auf jeden Fall portabel
+#    TOOL=$(echo "${2}" | tr '[:lower:]' '[:upper:]') # das hier ist auf jeden Fall portabel
     TOOL="${2^^}" # das hier ist ein Bash-Konstrukt um alle Buchstaben in Versalien zu wandeln
     # wenn 3. Parameter vorhanden und natürliche Zahl
     # zwischen 149 und 601, verändere PARAM3 auf diese Zahl
     # wenn keine nat. Zahl, dann speichere den Inhalt in PARAM4
-    [ $ARGSCOUNT -gt 2 ] && [[ "${3}" =~ ^[0-9]+$ ]] && [ $3 -gt 149 ] && [ $3 -lt 601 ] && PARAM3=$3 || PARAM4="${3}"
+    [ $ARGSCOUNT -gt 2 ] && [ "${3}" =~ ^[0-9]+$ ] && [ $3 -gt 149 ] && [ $3 -lt 601 ] && PARAM3=$3 || PARAM4="${3}"
     # ist da noch ein vierter Parameter, nimm den für PARAM4
     [ $ARGSCOUNT -gt 3 ] && PARAM4="${4}"
     # Umrechnungsfaktor DTP-Punkt im mm für die Ausgaben mit awk der Seitenformate
     UF=0.3528
     # Formatbreite feststellen
-    BREITE=`pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$3*f}'`
+    BREITE=$(pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$3*f}')
     # Formathöhe feststellen
-    HOEHE=`pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$5*f}'`
+    HOEHE=$(pdfinfo "${DATEI}" | grep "Page size" | awk -v f=$UF '{printf "%5.0f",$5*f}')
     # HF oder QF
     # TODO : HF und QF müssen sich eigentlich um 2cm unterscheiden,
     # sonst ist es per Definition ein quadratisches Format,
@@ -141,56 +141,56 @@ if [ -e "${1}" ] # wenn Datei existiert
 case ${TOOL} in
 ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzeichnis
   # erstelle Verzeichnisstruktur entweder mit cp -rf aus Verzeichnisbaum oder mit mkdir -p wenn Vorlagenverzeichnis nicht existent
-  [ -d "${DIRSTRUCT}" ] && cp -rf "${DIRSTRUCT}" "${DNAMENOEXT}" || mkdir -p "${DIRMIDI}" "${DIRSNDFONT}" "${DIROUTPUT}" "${DIRBCKORIG}" "${DIRANIM}" "${DIRVECTOR}" "${DIRPALETTES}" "${DIRPROFILES}" "${DIRVIDEOS}" "${DIRATTACH}" "${DIRSERIAL}" "${DIRHTML}" "${DIRFONTS}" "${DIRSTYLES}" "${DIRGRIDS}"
+  [ -d "${DIRSTRUCT}" ] && { cp -rf --  "${DIRSTRUCT}" "${DNAMENOEXT}"; rm -- "${DNAMENOEXT}"/Vorlage.sla; } || mkdir -p -- "${DIRMIDI}" "${DIRSNDFONT}" "${DIROUTPUT}" "${DIRBCKORIG}" "${DIRANIM}" "${DIRVECTOR}" "${DIRPALETTES}" "${DIRPROFILES}" "${DIRVIDEOS}" "${DIRATTACH}" "${DIRSERIAL}" "${DIRHTML}" "${DIRFONTS}" "${DIRSTYLES}" "${DIRGRIDS}"
   # wechsele dann hinein
   cd "${DNAMENOEXT}"
   # und kopiere die Originaldatei hinein
-  cp "../${DNAME}" "${DNAME}"
+  cp -- "../${DNAME}" "${DNAME}"
   # separiere Einzelseiten als PDFs erstellen
   ${SCRIPTNAME} "${DNAME}" SEPPAGES
   # aus jeder Einzelseite
-  for i in `ls *-????.pdf`
+  for i in *-????.pdf
     do
     # den Text extrahieren
     ${SCRIPTNAME} "${i}" TEXTEXT
     # in Unterverzeichnis verschieben
-    mv *.txt "${DIRTXT}/"
+    mv -- *.txt "${DIRTXT}/"
     # eine SVG-Datei erstellen
     pdftocairo -svg "${i}" "${i%.*}.svg"
     # in Unterverzeichnis verschieben
-    mv *.svg "${DIRVECTOR}/"
+    mv -- *.svg "${DIRVECTOR}/"
     # eine PostScript-Datei erstellen
     pdftops "${i}"
     # in Unterverzeichnis verschieben
-    mv *.ps "${DIRVECTOR}/"
+    mv -- *.ps "${DIRVECTOR}/"
     # Einzelseite in Backupverzeichnis verschieben
-    mv "${i}" "${DIRBCKUP}/"
+    mv -- "${i}" "${DIRBCKUP}/"
     done
 
   # Gesamttext aus Originaldatei extrahieren
   ${SCRIPTNAME} "${DNAME}" TEXTEXT
   # und extrahierten Gesamttext in Unterverzeichnis verschieben
-  mv *.txt "${DIRTXT}/"
+  mv -- *.txt "${DIRTXT}/"
 
   #TODO: Tabellen aus PDF extrahieren siehe TEXTEXT)
 
   # extrahiere alle Bilder
   ${SCRIPTNAME} "${DNAME}" IMGEXT
   # mit jedem Bild
-  for i in `ls -p --hide=*.pdf | grep -v '/$'`
+  for i in $(ls -p --hide=*.pdf | grep -v '/$')
     do
     # vorhandenes Profil extrahieren
     oyranos-icc -f icc -i "${i}" > "${i%.*}.profile"
     # und dieses in Profilordner verschieben
-    mv "${i%.*}.profile" "${DIRPROFILES}/"
+    mv -- "${i%.*}.profile" "${DIRPROFILES}/"
     # verarbeitetes Bild in Bildordner verschieben
-    mv "${i}" "${DIRIMGS}/"
+    mv -- "${i}" "${DIRIMGS}/"
     done
 
   # Wandle gesamte PDF in HTML um
   pdftohtml "${DNAME}"
   # und verschiebe das ganze HTML-Gedoens in Unterverzeichnis
-  for i in `ls -p --hide=*.pdf | grep -v '/$'`; do mv "${i}" "${DIRHTML}/"; done
+  for i in $(ls -p --hide=*.pdf | grep -v '/$'); do mv -- "${i}" "${DIRHTML}/"; done
 
   # Schriften extrahieren
   # extrahiere alles --> ist die einzige Methode, die ich kenne um
@@ -201,18 +201,18 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   # kann man zwar selbst generieren, aber die haben mit
   # ordentlichem Kerning nix zu tun
   # dafür kann ich sehen, welche Zeichen in der Datei enthalten sind
-  for i in `ls *.cff`; do cfftot1 "${i}" "${i%.*}.pfb"; done
+  for i in *.cff; do cfftot1 "${i}" "${i%.*}.pfb"; done
   # Schriftdateien in Unterverzeichnis verschieben (das ist alles,
   # was mir an Font-Dateien einfällt, was man einbetten könnte)
   # da bin ich mir aber nicht ganz sicher
-  for i in `ls *.?tf *.odttf *.cff *.pf? *.tfm *.fon *.a?f* *.afm *.dfont *.fnt *.lwfn`; do mv "${i}" "${DIRFONTS}/"; done
+  for i in *.?tf *.odttf *.cff *.pf? *.tfm *.fon *.a?f* *.afm *.dfont *.fnt *.lwfn; do mv -- "${i}" "${DIRFONTS}/"; done
   # alles andere bis auf die Originalpdf wieder löschen
-  for i in `ls -p --hide=*.pdf | grep -v '/$'`; do rm "${i}"; done
+  for i in $(ls -p --hide=*.pdf | grep -v '/$'); do rm -- "${i}"; done
 
   # extrahiere alle Dateianhänge
   ${SCRIPTNAME} "${DNAME}" DETACH
   # und verschiebe alles was hier jetzt liegt außer der PDF in Unterverzeichnis
-  for i in `ls -p --hide=*.pdf | grep -v '/$'`; do mv "${i}" "${DIRATTACH}/"; done
+  for i in $(ls -p --hide=*.pdf | grep -v '/$'); do mv -- "${i}" "${DIRATTACH}/"; done
 
   # allgemeine Informationen aus der PDF extrahieren
   ${SCRIPTNAME} "${DNAME}" INFO
@@ -221,7 +221,7 @@ ALLES) # mache alles, was du unten auch machen kannst, aber in ein eigens Verzei
   # folgende Dateien befinden sich jetzt im neu angelegten Verzeichnis:
   # Original-PDF, PS-Datei aus Original-PDF, extrahierte Infos (.pdfinfo)
   # Verschiebe die ins Unterverzeichnis
-  mv *.* "${DIRBCKORIG}/"
+  mv -- *.* "${DIRBCKORIG}/"
   ;;
 
 INFO) # extrahiert alle Informationen aus der PDF-Datei über:
@@ -237,17 +237,17 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   # Name für die Info.Datei festlegen
   TMPDATEI="${DATEI}info"
   # sind Tags in der Datei?
-  GETAGGT=`pdfinfo "${DATEI}" | grep Tag | awk '{ print $2 }'`
+  GETAGGT=$(pdfinfo "${DATEI}" | grep Tag | awk '{ print $2 }')
   # ist JavaScript drin?
-  JAVASCRIPT=`pdfinfo "${DATEI}" | grep Java | awk '{ print $2 }'`
+  JAVASCRIPT=$(pdfinfo "${DATEI}" | grep Java | awk '{ print $2 }')
   # wieviele Seiten hat die Datei
-  LSEITE=`pdfinfo "${DATEI}" | grep Pages | awk '{ print $2 }'`
+  LSEITE=$(pdfinfo "${DATEI}" | grep Pages | awk '{ print $2 }')
   echo "Informationen zu --- <${DATEI}> ---" > "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
 
   # wenn Schriften genutzt wurden und in irgendeiner Art in der Datei eingebunden sind
   # oder vergessen wurden einzubetten und substituiert werden, dann zeige diese
-  if pdffonts "${DATEI}" | egrep '.*(yes|no).*' > /dev/null
+  if pdffonts "${DATEI}" | grep -E '.*(yes|no).*' > /dev/null
     then
     echo "-------------------- genutzte Schriften --------------------" >> "${TMPDATEI}"
     pdffonts "${DATEI}" >> "${TMPDATEI}"
@@ -276,7 +276,7 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
     grep Separation /tmp/"${DNAMENOEXT}".ps | awk '{printf "%-8s %-4s %-3s %s\n",$2,$3,$4,$5}' | sed 's/[\(\)\[\/\]//g' | sort | uniq >> "${TMPDATEI}"
     echo "." >> "${TMPDATEI}"
     fi
-  rm /tmp/"${DNAMENOEXT}".ps
+  rm -- /tmp/"${DNAMENOEXT}".ps
 
   # alle enthaltenen, angehängten Dateien auflisten
   echo "-------------------- enthaltene Dateien --------------------" >> "${TMPDATEI}"
@@ -288,10 +288,10 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   # Ersteller, genutztes Programm, Farbmanagement-Bibliotheken, PDF-Version, usw.
   pdfinfo "${DATEI}" >> "${TMPDATEI}"  # wenn es nur die PDF-Version sein müsste, dann würde file "${DATEI}" genügen
   # PDF/X-Konformität feststellen
-  PDFX=`pdfinfo -meta "${DATEI}" | grep pdfx | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /'`
+  PDFX=$(pdfinfo -meta "${DATEI}" | grep pdfx | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /')
   echo "PDF-X ID / Version / Conformance:${PDFX}" >> "${TMPDATEI}"
   # Definierte Darstellungsklasse
-  PDFX=`pdfinfo -meta "${DATEI}" | grep endition | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /'`
+  PDFX=$(pdfinfo -meta "${DATEI}" | grep endition | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /')
   echo "Rendition-Class: ${PDFX}" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
   # Wurde die Datei mit ÜberfÜllungen erstellt oder ohne
@@ -364,11 +364,11 @@ SEPPAGES) # zerlegt mehrseitige PDF-Dateien in Einzelseiten
 
 COLSEP)
   gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=tiffsep -r300 -sOutputFile="${DNAMENOEXT}".cmyk. "${DATEI}"
-  for i in `ls *.cmyk.*`
+  for i in *.cmyk.*
     do 
-    tiff2pdf "${i}" -o "${i}.pdf" && rm "${i}"
+    tiff2pdf "${i}" -o "${i}.pdf" && rm -- "${i}"
     done
-  pdftk "${DATEI}" "${DNAMENOEXT}.cmyk."*.tif.pdf cat output "${DNAMENOEXT}-CMYK.pdf" && rm *.cmyk.*
+  pdftk "${DATEI}" "${DNAMENOEXT}.cmyk."*.tif.pdf cat output "${DNAMENOEXT}-CMYK.pdf" && rm -- *.cmyk.*
   ;;
   
 DETACH) # extrahiert alle angehängten/eingebetteten Dateien
@@ -376,7 +376,7 @@ DETACH) # extrahiert alle angehängten/eingebetteten Dateien
   ;;
 
 ATTACH) # bettet Datei(en) in eine PDF-Datei ein
-  pdftk "${DATEI}" attach_file "${PARAM4}" output "${PFAD}/${DNAMENOEXT}-att.pdf" && mv "${PFAD}/${DNAMENOEXT}-att.pdf" "${DATEI}" && rm "${PARAM4}"
+  pdftk "${DATEI}" attach_file "${PARAM4}" output "${PFAD}/${DNAMENOEXT}-att.pdf" && mv -- "${PFAD}/${DNAMENOEXT}-att.pdf" "${DATEI}" && rm -- "${PARAM4}"
   ;;
 
 HTML) # wandelt die PDF-Datei in ein HTML-Archiv um
@@ -393,7 +393,7 @@ PDFA1B) # erstellt neue PDF-Datei in PDF-A-1b-Format
   # die PostScript-Datei dann als PDFA1B erstellen
   gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -sOutputFile="${DNAMENOEXT}-A1b.pdf" "${DNAMENOEXT}".ps
   # PostScript-Datei wieder loeschen
-  rm -rf "${DNAMENOEXT}".ps
+  rm -rf -- "${DNAMENOEXT}".ps
   ;;
 
 ROTL) # alle Seiten um 90 Grad gegen den UZS drehen
@@ -420,13 +420,13 @@ M2S) # erstelle PDF mit 2 Seiten pro Blatt
     # jeweils 2 Seiten zusammenbasteln aus der rotierten Datei und in eine neue Datei schreiben
     pdfjam --suffix 2pg --nup 2x1 --landscape --frame true "${DNAMENOEXT}"-ROTL.pdf
     # erste rotierte Datei löschen
-    rm -rf "${DNAMENOEXT}"-ROTL.pdf
+    rm -rf -- "${DNAMENOEXT}"-ROTL.pdf
     # die zweiseitige Datei jetzt wieder 90° nach rechts rotieren
     ${SCRIPTNAME} "${DNAMENOEXT}"-ROTL-2pg.pdf ROTR
     # lösche die linksrotierte Datei
-    rm -rf "${DNAMENOEXT}"-ROTL-2pg.pdf
+    rm -rf -- "${DNAMENOEXT}"-ROTL-2pg.pdf
     # benenne die entstandene zweiseitige Datei um
-    mv "${DNAMENOEXT}"-ROTL-2pg-ROTR.pdf "${DNAMENOEXT}"-2pg.pdf
+    mv -- "${DNAMENOEXT}"-ROTL-2pg-ROTR.pdf "${DNAMENOEXT}"-2pg.pdf
     # ich weiß nicht mehr warum, aber wenn ich das nicht bzw. auf andere Weise mache,
     # hat es beim Querformat jedes mal wie Scheiße ausgesehen
     else
@@ -445,7 +445,7 @@ ALLFEAT) # Alle Features der PDF-Datei einschalten
   # erstellt eine Datei ohne Owner-Passwort --> klappt nur, wenn kein User-Passwort gesetzt
   qpdf --decrypt "${DATEI}" "${DNAMENOEXT}"-NOPWD.pdf
   # jetzt bastele daraus eine PDF, mit der alles erlaubt ist
-  pdftk "${DNAMENOEXT}"-NOPWD.pdf output "${DNAMENOEXT}"-AFA.pdf allow AllFeatures && rm -rf "${DNAMENOEXT}"-NOPWD.pdf
+  pdftk "${DNAMENOEXT}"-NOPWD.pdf output "${DNAMENOEXT}"-AFA.pdf allow AllFeatures && rm -rf -- "${DNAMENOEXT}"-NOPWD.pdf
   # alternative:
   # gs -sPDFPasword=$PASS -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -r300 -sOutputFile="${DNAMENOEXT}"-AFA.pdf -c .setpdfwrite -f "${DATEI}"
   #
