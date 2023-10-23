@@ -12,7 +12,6 @@
 #--------------------------------------------------------------------------------------#
 #------------------------------- Variablendeklarationen -------------------------------#
 #--------------------------------------------------------------------------------------#
-IFSTMP="${IFS}"                      # urspruengliche Trennzeichen zwischenspeichern
 IFS=$'\t\n'                          # Trennzeichen auf TAB und NEWLINE alleine
 SCRIPTNAME="${0##*/}"                # Scriptname feststellen
 KURZNAME="${SCRIPTNAME%%.*}"         # Scriptname ohne Erweiterung
@@ -64,22 +63,107 @@ PARAM4="deu"
 #------------------------------------ Includefiles ------------------------------------#
 #--------------------------------------------------------------------------------------#
 #
-# hier binde ich die Funktion testbinary aus der Datei ~/bin/testbinary.include ein
-# Sie testet auf optionale und unbedingt benoetigte (-b) Binaries / Shell-builtins / Scripte
-# fehlt ein unbedingt benötigtes stoppt hier die Scriptausfuehrung mit der Ausgabe,
-# was den tatsächlich fehlt. fehlt ~/bin/testbinary.include wirft das Script einen
-# Fehler, läuft aber weiter,
-# [ -e ~/bin/testbinary.include ] && source ~/bin/testbinary.include || echo "~/bin/testbinary.include not found"
-# wenn die Funktion nicht eingebunden wurde, Fehler auswerfen, aber weiter machen
-#declare -f testbinary > /dev/null && testbinary -b realpath file sort uniq basename dirname tr grep awk ls mv mkdir rm cp pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert
-
-which realpath sort uniq basename dirname tr grep awk pdfinfo oyranos-icc podofopdfinfo pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert > /dev/null
+# teste ob alle benötigten Programme installiert sind
+which realpath sort uniq basename dirname tr grep awk pdfinfo oyranos-icc pdffonts pdfimages pdfdetach pdfseparate pdftops pdftocairo pdftohtml pdftotext pdftoppm pdftk pdfjam cfftot1 mutool tesseract qpdf convert > /dev/null
 
 
 #--------------------------------------------------------------------------------------#
 #------------------------------- Funktionsdeklarationen -------------------------------#
 #--------------------------------------------------------------------------------------#
 #
+
+#----------------- Funktion cleanup
+# Errorhandler bei Scriptabbruch
+#
+cleanup () {
+  # hier kann definiert werden, was alles
+  # aufgeaeumt werden muss bevor das Script
+  # wirklich abgebrochen bzw. beendet wird. 
+  : # tue nichts, aber mit einem exitcode von 0, was aber bei
+    # einem Abbruch den Exitcodes des Scriptes nicht ändert (!) ;-)
+  # pause # warte auf einen Tastendruck
+  }
+
+trap cleanup exit
+
+pause () {
+# wartet auf beliebigen Tastendruck bevor es weiter geht
+  read -s -n 1 -p "weiter mit beliebiger Taste "
+  }
+
+
+hilfe () {
+# Ausgabe der Hilfe
+  cat << EOF
+
+  Aufruf:
+  user@linux:~> ${SCRIPTNAME} <PDF-Dokument> PARAMETER1 PARAMETER2 PARAMETER3
+
+  <PDF-Dokument> --> eine PDF-Datei beliebigen Formates / beliebiger Version
+
+  moegliche Werte PARAMETER1:
+  INFO     --> 	ermittelt soviele Informationen wie möglich schreibt
+         		sie in Dateiname.pdfinfo
+  TEXTEXT  --> 	extrahiert den in der PDF-Datei enthaltenen Text
+		        in Dateiname.txt
+	        Zur Texterkennung per OCR muss mindestens PARAMETER2
+	        angegeben werden:
+                    wird PARAMETER2 angegeben und ist eine natürliche
+                    Zahl zwischen 150 und 600 wird er als dpi-Angabe für die
+                    Texterkennung per OCR interpretiert.
+                    Sollte PARAMETER2 keine nat. Zahl sein, wird er als
+                    Sprachangabe für die Texterkennung per OCR
+                    interpretiert und Standardauflösung (150dpi) gesetzt.
+                    Wird PARAMETER3 angegeben, wird dieser als
+                    Sprachangabe für die Texterkennung genutzt.
+                    Ansonsten wird als Standardsprache deutsch (deu) genutzt
+  IMGEXT   --> 	extrahiert alle im PDF-Dokument vorhandenen Bilder in
+                Originalauflösung nach dem Schema:
+	                    Dateiname-Seitenzahl-Bildnummer.[png|tiff|jpg|jp2|ppm]
+	        und extrahiert aus den Bildern vorhandene Farbprofile
+  SEPPAGES --> 	Erstellt aus jeder Seite der PDF-Datei ein eigenes PDF-Dokument
+                nach dem Schema Dateiname-Seitenzahl.pdf
+  DETACH   --> 	extrahiert alle Dateianhänge (falls denn welche existieren)
+  ATTACH   --> 	hängt eine Datei als Attachment an die PDF-Datei an
+                (das Original der angehaengten Datei wird geloescht)
+  HTML     --> 	Erstellt aus der PDF-Datei ein HTML-Dokument (nicht schoen)
+  PS       --> 	Erstellt aus der PDF-Datei eine PostScript-Datei
+  ALLES    --> 	Alles was INFO, TEXTEXT IMGEXT, SEPPAGES, DETACH, HTML und PS
+	        machen. Des weiteren werden vorhandene Schriftdaten extrahiert,
+	        Einzelseiten in SVG- und PostScript-Dateien gewandelt, damit
+	        evtl. vorhandene Vektordaten daraus haendisch extrahiert werden
+	        koennen und alle Dateien in entsprechende Unterverzeichnisse
+	        einsortiert.
+  PDFA1B   --> 	Erstellt eine Datei im Format PDF-A-1b
+  ROTL     --> 	rotiert alle Seiten um 90° gegen den Uhrzeigersinn
+                im Verhaeltnis zur Ausrichtung der Originaldatei
+  ROTR     --> 	rotiert alle Seiten um 90° im Uhrzeigersinn
+                im Verhaeltnis zur Ausrichtung der Originaldatei
+  ROTD     --> 	rotiert alle Seiten um 180°
+                im Verhaeltnis zur Ausrichtung der Originaldatei
+  REVERSE  -->	kehrt die Seitenreihenfolge um
+  M2S      --> 	erstelle PDF mit 2 Seiten pro Blatt
+  M4S      --> 	erstelle PDF mit 4 Seiten pro Blatt
+  ALLFEAT  --> 	hebt alle Restriktionen innerhalb der PDF auf
+                (Drucken erlaubt, Kommentiern erlaubt, usw.)
+  CONVPNG  -->	konvertiert alle Seiten zu PNG-Pixelgrafiken mit der
+                in PARAMETER2 angegebenen Aufloseung. Sollte PARAMETER2
+                keine nat. Zahl zwischen 150 und 600 sein, wird die
+                Standardaufloesung von 150dpi gesetzt
+  CONVJPG  -->	konvertiert alle Seiten zu JPG-Pixelgrafiken  mit der
+                in PARAMETER2 angegebenen Aufloseung. Sollte PARAMETER2
+                keine nat. Zahl zwischen 150 und 600 sein, wird die
+                Standardaufloesung von 150dpi gesetzt
+
+  Benoetigt werden folgende Programme:
+  realpath, basename, dirname, tr, grep, awk, sort,
+  uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
+  pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
+  pdfjam, cfftot1, mutool, tesseract, qpdf, convert
+
+EOF
+  }
+  
 #
 #--------------------------------------------------------------------------------------#
 #--------------------------- bedingte Variablendeklarationen --------------------------#
@@ -294,14 +378,21 @@ INFO) # extrahiert alle Informationen aus der PDF-Datei über:
   PDFX=$(pdfinfo -meta "${DATEI}" | grep endition | cut -d'>' -f2 | cut -d'<' -f1 | tr '@\n' ' ' | sed 's/\ \ /\ /')
   echo "Rendition-Class: ${PDFX}" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
+  # Nachfolgende drei Positionen von podofopdfinfo mit grep -a  ersetzt, da podofopdfinfo momentan nicht maintained ist
+  # und daher die Uebernahme in Distributionen nicht empfohlen wird. Ob da aber alles genauso rauskommt wie es soll habe
+  # ich noch nicht vollstaendig geprueft Aber Trapping funktioniert.
+  # Trapping kan sein False, True, wenn nicht definiert oder angegeben, dann keine PDF-X[34]-Konformitaet
   # Wurde die Datei mit ÜberfÜllungen erstellt oder ohne
-  podofopdfinfo C "${DATEI}" | grep Trapped | tr -d '\t' >> "${TMPDATEI}"
+  #podofopdfinfo C "${DATEI}" | grep Trapped | tr -d '\t' >> "${TMPDATEI}"
+  grep -a "/Trapped" "${DATEI}" | tr -d '/' | sed -e "s/ /:\t/g" >> "${TMPDATEI}"
   # | awk '{printf "%-31s %s\n",$1,$2}' >> "${TMPDATEI}"
   # Liste auf, was mit der Datei alles gemacht werden darf
   # Kommentieren, drucken, ansehen, usw
-  podofopdfinfo D "${DATEI}" | grep Allowed | tr -d '\t' >> "${TMPDATEI}"
+  #podofopdfinfo D "${DATEI}" | grep Allowed | tr -d '\t' >> "${TMPDATEI}"
+  grep -a " /Allowed" "${DATEI}" | tr -d '/' | sed -e "s/ /:\t/g" >> "${TMPDATEI}"
   # | awk 'NR==1 {printf "%s %-22s %s\n",$1,$2,$3} NR==2 {printf "%s %-18s %s\n",$1,$2,$3} NR==3 {printf "%s %-20s %s\n",$1,$2,$3} NR==4 {printf "%s %s %-4s %s\n",$1,$2,$3,$4} NR==5 {printf "%s %-21s %s\n",$1,$2,$3} NR==6 {printf "%s %-17s %s\n",$1,$2,$3} NR==7 {printf "%s %s %-13s %s\n",$1,$2,$3,$4} NR==8 {printf "%s %s %s %-12s %s\n",$1,$2,$3,$4,$5}' >> "${TMPDATEI}"
-  podofopdfinfo D "${DATEI}" | grep Enabled | tr -d '\t' >> "${TMPDATEI}"
+  #podofopdfinfo D "${DATEI}" | grep Enabled | tr -d '\t' >> "${TMPDATEI}"
+  grep -a " /Enabled" "${DATEI}" | tr -d '/' | sed -e "s/ /:\t/g" >> "${TMPDATEI}"
   echo "." >> "${TMPDATEI}"
   # Dokumentenformat umgerechnet von pts in mm
   pdfinfo -box "${DATEI}" | grep "Page size:" | awk -v f=$UF '{printf "Format: %5.0f x %5.0f mm %s\n",$3*f,$5*f,$7}' >> "${TMPDATEI}"
@@ -460,74 +551,9 @@ CONVJPG) # konvertiert alle Seiten zu JPG-Pixelgrafik mit der angegebenen Aufloe
   ;;
 
 *) # tue nichts ;-)
-  cat << EOF
-
-  Aufruf:
-  user@linux:~> ${SCRIPTNAME} <PDF-Dokument> PARAMETER1 PARAMETER2 PARAMETER3
-
-  <PDF-Dokument> --> eine PDF-Datei beliebigen Formates / beliebiger Version
-
-  moegliche Werte PARAMETER1:
-  INFO     --> 	ermittelt soviele Informationen wie möglich schreibt
-         		sie in Dateiname.pdfinfo
-  TEXTEXT  --> 	extrahiert den in der PDF-Datei enthaltenen Text
-		        in Dateiname.txt
-	        Zur Texterkennung per OCR muss mindestens PARAMETER2
-	        angegeben werden:
-                    wird PARAMETER2 angegeben und ist eine natürliche
-                    Zahl zwischen 150 und 600 wird er als dpi-Angabe für die
-                    Texterkennung per OCR interpretiert.
-                    Sollte PARAMETER2 keine nat. Zahl sein, wird er als
-                    Sprachangabe für die Texterkennung per OCR
-                    interpretiert und Standardauflösung (150dpi) gesetzt.
-                    Wird PARAMETER3 angegeben, wird dieser als
-                    Sprachangabe für die Texterkennung genutzt.
-                    Ansonsten wird als Standardsprache deutsch (deu) genutzt
-  IMGEXT   --> 	extrahiert alle im PDF-Dokument vorhandenen Bilder in
-                Originalauflösung nach dem Schema:
-	                    Dateiname-Seitenzahl-Bildnummer.[png|tiff|jpg|jp2|ppm]
-	        und extrahiert aus den Bildern vorhandene Farbprofile
-  SEPPAGES --> 	Erstellt aus jeder Seite der PDF-Datei ein eigenes PDF-Dokument
-                nach dem Schema Dateiname-Seitenzahl.pdf
-  DETACH   --> 	extrahiert alle Dateianhänge (falls denn welche existieren)
-  ATTACH   --> 	hängt eine Datei als Attachment an die PDF-Datei an
-                (das Original der angehaengten Datei wird geloescht)
-  HTML     --> 	Erstellt aus der PDF-Datei ein HTML-Dokument (nicht schoen)
-  PS       --> 	Erstellt aus der PDF-Datei eine PostScript-Datei
-  ALLES    --> 	Alles was INFO, TEXTEXT IMGEXT, SEPPAGES, DETACH, HTML und PS
-	        machen. Des weiteren werden vorhandene Schriftdaten extrahiert,
-	        Einzelseiten in SVG- und PostScript-Dateien gewandelt, damit
-	        evtl. vorhandene Vektordaten daraus haendisch extrahiert werden
-	        koennen und alle Dateien in entsprechende Unterverzeichnisse
-	        einsortiert.
-  PDFA1B   --> 	Erstellt eine Datei im Format PDF-A-1b
-  ROTL     --> 	rotiert alle Seiten um 90° gegen den Uhrzeigersinn
-                im Verhaeltnis zur Ausrichtung der Originaldatei
-  ROTR     --> 	rotiert alle Seiten um 90° im Uhrzeigersinn
-                im Verhaeltnis zur Ausrichtung der Originaldatei
-  ROTD     --> 	rotiert alle Seiten um 180°
-                im Verhaeltnis zur Ausrichtung der Originaldatei
-  REVERSE  -->	kehrt die Seitenreihenfolge um
-  M2S      --> 	erstelle PDF mit 2 Seiten pro Blatt
-  M4S      --> 	erstelle PDF mit 4 Seiten pro Blatt
-  ALLFEAT  --> 	hebt alle Restriktionen innerhalb der PDF auf
-                (Drucken erlaubt, Kommentiern erlaubt, usw.)
-  CONVPNG  -->	konvertiert alle Seiten zu PNG-Pixelgrafiken mit der
-                in PARAMETER2 angegebenen Aufloseung. Sollte PARAMETER2
-                keine nat. Zahl zwischen 150 und 600 sein, wird die
-                Standardaufloesung von 150dpi gesetzt
-  CONVJPG  -->	konvertiert alle Seiten zu JPG-Pixelgrafiken  mit der
-                in PARAMETER2 angegebenen Aufloseung. Sollte PARAMETER2
-                keine nat. Zahl zwischen 150 und 600 sein, wird die
-                Standardaufloesung von 150dpi gesetzt
-
-  Benoetigt werden folgende Programme:
-  realpath, basename, dirname, tr, grep, awk, sort,
-  uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
-  pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
-  pdfjam, cfftot1, mutool, tesseract, qpdf, convert
-
-EOF
- ;;
+  hilfe
+  ;;
 
 esac
+
+exit $E_OK
