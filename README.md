@@ -98,7 +98,7 @@ user@linux:~/Pfad/zu/den/entpackten/Dateien/myPDF-Tool> bash ./install
   Benoetigt werden folgende Programme:
   
   realpath, basename, dirname, tr, grep, awk, sort, file,
-  uniq, pdfinfo, oyranos-icc, podofopdfinfo, pdffonts, pdfimages, pdfdetach,
+  uniq, pdfinfo, oyranos-icc, pdffonts, pdfimages, pdfdetach,
   pdfseparate, pdftops, pdftocairo, pdftohtml, pdftotext, pdftoppm, pdftk,
   pdfjam, cfftot1, mutool, tesseract, qpdf, convert
   
