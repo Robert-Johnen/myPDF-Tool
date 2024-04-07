@@ -4,16 +4,19 @@
 # fuer den lokalen Benutzer
 #
 set -x
-######################### KDE 5 / Plasma / Dolphin
+######################### KDE 5/6 / Plasma 5/6 / Dolphin
 # Wenn entsprechendes Ziel-Verzeichnisse noch nicht existieren, dann lege es an
 [ -d ~/.local/share/kservices5/ServiceMenus ] || mkdir -p ~/.local/share/kservices5/ServiceMenus 
+[ -d ~/.local/share/kio/servicemenus ] || mkdir -p ~/.local/share/kio/servicemenus 
 
-# kopiere die Dateien in die entsprechenden Verzeichnisse
+# kopiere die Dateien in die entsprechenden Verzeichnisse KDE Plasma 5/6
 cp -t ~/.local/share/kservices5/ServiceMenus/ *.desktop
+cp -t ~/.local/share/kio/servicemenus/ *.desktop
 
 # in Dolphn als Service anmelden
-kbuildsycoca4
+# kbuildsycoca4
 kbuildsycoca5
+kbuildsycoca6
 
 ######################### Cinnamon / Nemo
 # Wenn entsprechende Ziel-Verzeichnisse noch nicht existieren, dann lege sie an
